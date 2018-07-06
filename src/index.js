@@ -1,3 +1,7 @@
+const Query = require('./resolvers/Query')
+const Mutation = require('./resolvers/Mutation')
+const AuthPayload = require('./resolvers/AuthPayload')
+
 const {
   Prisma
 } = require('prisma-binding')
@@ -7,45 +11,9 @@ const {
 } = require('graphql-yoga')
 
 const resolvers = {
-  Query: {
-    info: () => `This is the API of a Hackernews Clone`,
-    feed: (root, args, context, info) => {
-      return context.db.query.links({}, info)
-    },
-    link: (id) => {
-      return links.find(function(obj) {
-        return obj.id === id
-      })
-    },
-  },
-  Mutation: {
-    post: (root, args, context, info) => {
-      return context.db.mutation.createLink({
-        data: {
-          url: args.url,
-          description: args.description,
-        },
-      }, info)
-    },
-  }
-  //
-  // updateLink: (id, url, description) => {
-  //   var link = links.find(function (obj) { return obj.id === id })
-  //   const updatedLink = {
-  //     id: link.id,
-  //     description: link.description,
-  //     url: link.url,
-  //   }
-  //   links.pop(link)
-  //   links.push(updatedLink)
-  //   return link
-  // },
-  //
-  // deleteLink: (id) => {
-  //   var link = links.find(function (obj) { return obj.id === id })
-  //   links.pop(link)
-  //   return link
-  // }
+  Query,
+  Mutation,
+  AuthPayload
 }
 
 const server = new GraphQLServer({
