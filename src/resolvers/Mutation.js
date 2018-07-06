@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const {
   APP_SECRET,
   getUserId
-} = require('../utilsa')
+} = require('../utils')
 
 function post(parent, args, context, info) {
   const userId = getUserId(context)
