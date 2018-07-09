@@ -1,9 +1,14 @@
-# import Link, LinkSubscriptionPayload, Vote, VoteSubscriptionPayload from "./generated/prisma.graphql"
+# import Link, LinkSubscriptionPayload, Vote, VoteSubscriptionPayload, LinkOrderByInput from "./generated/prisma.graphql"
 
 type Query {
   info: String!
-  feed(filter: String, skip: String, first: String): [Link!]!
+  feed(filter: String, skip: String, first: String, orderBy: LinkOrderByInput): Feed!
   link(id: ID!): Link
+}
+
+type Feed {
+  links: [Link!]!
+  count: Int!
 }
 
 type Mutation {
