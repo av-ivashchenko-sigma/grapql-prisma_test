@@ -9,7 +9,9 @@ function feed(parent, args, context, info) {
     ]
   } : {}
   return context.db.query.links({
-    where
+    where,
+    skip: args.skip,
+    first: args.first
   }, info)
 }
 
