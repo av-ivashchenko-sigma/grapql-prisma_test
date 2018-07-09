@@ -1,11 +1,15 @@
 # source: https://eu1.prisma.sh/aleksandr-ivashchenko/test_graphql_prisma/dev
-# timestamp: Mon Jul 09 2018 12:56:53 GMT+0300 (EEST)
+# timestamp: Mon Jul 09 2018 17:29:46 GMT+0300 (EEST)
 
 type AggregateLink {
   count: Int!
 }
 
 type AggregateUser {
+  count: Int!
+}
+
+type AggregateVote {
   count: Int!
 }
 
@@ -43,6 +47,11 @@ input LinkCreateInput {
 input LinkCreateManyWithoutPostedByInput {
   create: [LinkCreateWithoutPostedByInput!]
   connect: [LinkWhereUniqueInput!]
+}
+
+input LinkCreateOneInput {
+  create: LinkCreateInput
+  connect: LinkWhereUniqueInput
 }
 
 input LinkCreateWithoutPostedByInput {
@@ -118,6 +127,12 @@ input LinkSubscriptionWhereInput {
   node: LinkWhereInput
 }
 
+input LinkUpdateDataInput {
+  description: String
+  url: String
+  postedBy: UserUpdateOneWithoutLinksInput
+}
+
 input LinkUpdateInput {
   description: String
   url: String
@@ -133,6 +148,14 @@ input LinkUpdateManyWithoutPostedByInput {
   upsert: [LinkUpsertWithWhereUniqueWithoutPostedByInput!]
 }
 
+input LinkUpdateOneInput {
+  create: LinkCreateInput
+  connect: LinkWhereUniqueInput
+  delete: Boolean
+  update: LinkUpdateDataInput
+  upsert: LinkUpsertNestedInput
+}
+
 input LinkUpdateWithoutPostedByDataInput {
   description: String
   url: String
@@ -141,6 +164,11 @@ input LinkUpdateWithoutPostedByDataInput {
 input LinkUpdateWithWhereUniqueWithoutPostedByInput {
   where: LinkWhereUniqueInput!
   data: LinkUpdateWithoutPostedByDataInput!
+}
+
+input LinkUpsertNestedInput {
+  update: LinkUpdateDataInput!
+  create: LinkCreateInput!
 }
 
 input LinkUpsertWithWhereUniqueWithoutPostedByInput {
@@ -301,6 +329,9 @@ input LinkWhereInput {
   """All values not ending with the given string."""
   url_not_ends_with: String
   postedBy: UserWhereInput
+  _MagicalBackRelation_LinkToVote_every: VoteWhereInput
+  _MagicalBackRelation_LinkToVote_some: VoteWhereInput
+  _MagicalBackRelation_LinkToVote_none: VoteWhereInput
 }
 
 input LinkWhereUniqueInput {
@@ -314,18 +345,24 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createLink(data: LinkCreateInput!): Link!
+  createVote(data: VoteCreateInput!): Vote!
   createUser(data: UserCreateInput!): User!
-  updateLink(data: LinkUpdateInput!, where: LinkWhereUniqueInput!): Link
+  createLink(data: LinkCreateInput!): Link!
+  updateVote(data: VoteUpdateInput!, where: VoteWhereUniqueInput!): Vote
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
-  deleteLink(where: LinkWhereUniqueInput!): Link
+  updateLink(data: LinkUpdateInput!, where: LinkWhereUniqueInput!): Link
+  deleteVote(where: VoteWhereUniqueInput!): Vote
   deleteUser(where: UserWhereUniqueInput!): User
-  upsertLink(where: LinkWhereUniqueInput!, create: LinkCreateInput!, update: LinkUpdateInput!): Link!
+  deleteLink(where: LinkWhereUniqueInput!): Link
+  upsertVote(where: VoteWhereUniqueInput!, create: VoteCreateInput!, update: VoteUpdateInput!): Vote!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyLinks(data: LinkUpdateInput!, where: LinkWhereInput): BatchPayload!
+  upsertLink(where: LinkWhereUniqueInput!, create: LinkCreateInput!, update: LinkUpdateInput!): Link!
+  updateManyVotes(data: VoteUpdateInput!, where: VoteWhereInput): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
-  deleteManyLinks(where: LinkWhereInput): BatchPayload!
+  updateManyLinks(data: LinkUpdateInput!, where: LinkWhereInput): BatchPayload!
+  deleteManyVotes(where: VoteWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  deleteManyLinks(where: LinkWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -356,12 +393,15 @@ type PageInfo {
 }
 
 type Query {
-  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link]!
+  votes(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Vote]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
-  link(where: LinkWhereUniqueInput!): Link
+  links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link]!
+  vote(where: VoteWhereUniqueInput!): Vote
   user(where: UserWhereUniqueInput!): User
-  linksConnection(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LinkConnection!
+  link(where: LinkWhereUniqueInput!): Link
+  votesConnection(where: VoteWhereInput, orderBy: VoteOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): VoteConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  linksConnection(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LinkConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -371,8 +411,9 @@ type Query {
 }
 
 type Subscription {
-  link(where: LinkSubscriptionWhereInput): LinkSubscriptionPayload
+  vote(where: VoteSubscriptionWhereInput): VoteSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  link(where: LinkSubscriptionWhereInput): LinkSubscriptionPayload
 }
 
 type User implements Node {
@@ -398,6 +439,11 @@ input UserCreateInput {
   email: String!
   password: String!
   links: LinkCreateManyWithoutPostedByInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutLinksInput {
@@ -481,11 +527,26 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
+input UserUpdateDataInput {
+  name: String
+  email: String
+  password: String
+  links: LinkUpdateManyWithoutPostedByInput
+}
+
 input UserUpdateInput {
   name: String
   email: String
   password: String
   links: LinkUpdateManyWithoutPostedByInput
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  delete: Boolean
+  update: UserUpdateDataInput
+  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneWithoutLinksInput {
@@ -501,6 +562,11 @@ input UserUpdateWithoutLinksDataInput {
   name: String
   email: String
   password: String
+}
+
+input UserUpsertNestedInput {
+  update: UserUpdateDataInput!
+  create: UserCreateInput!
 }
 
 input UserUpsertWithoutLinksInput {
@@ -680,9 +746,156 @@ input UserWhereInput {
   links_every: LinkWhereInput
   links_some: LinkWhereInput
   links_none: LinkWhereInput
+  _MagicalBackRelation_UserToVote_every: VoteWhereInput
+  _MagicalBackRelation_UserToVote_some: VoteWhereInput
+  _MagicalBackRelation_UserToVote_none: VoteWhereInput
 }
 
 input UserWhereUniqueInput {
   id: ID
   email: String
+}
+
+type Vote implements Node {
+  id: ID!
+  link(where: LinkWhereInput): Link!
+  user(where: UserWhereInput): User!
+}
+
+"""A connection to a list of items."""
+type VoteConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [VoteEdge]!
+  aggregate: AggregateVote!
+}
+
+input VoteCreateInput {
+  link: LinkCreateOneInput!
+  user: UserCreateOneInput!
+}
+
+"""An edge in a connection."""
+type VoteEdge {
+  """The item at the end of the edge."""
+  node: Vote!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum VoteOrderByInput {
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type VotePreviousValues {
+  id: ID!
+}
+
+type VoteSubscriptionPayload {
+  mutation: MutationType!
+  node: Vote
+  updatedFields: [String!]
+  previousValues: VotePreviousValues
+}
+
+input VoteSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VoteSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VoteSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VoteSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: VoteWhereInput
+}
+
+input VoteUpdateInput {
+  link: LinkUpdateOneInput
+  user: UserUpdateOneInput
+}
+
+input VoteWhereInput {
+  """Logical AND on all given filters."""
+  AND: [VoteWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [VoteWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [VoteWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  link: LinkWhereInput
+  user: UserWhereInput
+}
+
+input VoteWhereUniqueInput {
+  id: ID
 }
