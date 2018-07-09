@@ -23,5 +23,6 @@ const newVote = {
 }
 
 module.exports = {
-  newLink
+  newLink,
+  newVote
 }
