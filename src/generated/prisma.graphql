@@ -1,5 +1,5 @@
-# source: http://localhost:4466
-# timestamp: Mon Jul 09 2018 11:51:24 GMT+0300 (EEST)
+# source: https://eu1.prisma.sh/aleksandr-ivashchenko/test_graphql_prisma/dev
+# timestamp: Mon Jul 09 2018 12:56:53 GMT+0300 (EEST)
 
 type AggregateLink {
   count: Int!
@@ -14,8 +14,11 @@ type BatchPayload {
   count: Long!
 }
 
+scalar DateTime
+
 type Link implements Node {
   id: ID!
+  createdAt: DateTime!
   description: String!
   url: String!
   postedBy(where: UserWhereInput): User
@@ -59,18 +62,19 @@ type LinkEdge {
 enum LinkOrderByInput {
   id_ASC
   id_DESC
+  createdAt_ASC
+  createdAt_DESC
   description_ASC
   description_DESC
   url_ASC
   url_DESC
   updatedAt_ASC
   updatedAt_DESC
-  createdAt_ASC
-  createdAt_DESC
 }
 
 type LinkPreviousValues {
   id: ID!
+  createdAt: DateTime!
   description: String!
   url: String!
 }
@@ -194,6 +198,28 @@ input LinkWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  createdAt: DateTime
+
+  """All values that are not equal to given value."""
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
   description: String
 
   """All values that are not equal to given value."""

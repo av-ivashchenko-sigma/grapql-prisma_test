@@ -1,6 +1,7 @@
 const Query = require('./resolvers/Query')
 const Mutation = require('./resolvers/Mutation')
 const AuthPayload = require('./resolvers/AuthPayload')
+// const Subscription = require('./resolvers/Subscription')
 
 const {
   Prisma
@@ -13,7 +14,8 @@ const {
 const resolvers = {
   Query,
   Mutation,
-  AuthPayload
+  AuthPayload,
+  // Subscription,
 }
 
 const server = new GraphQLServer({

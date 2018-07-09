@@ -24,7 +24,7 @@ async function signup(parent, args, context, info) {
   }
 }
 
-async function login(parent, args, context, inspect, info) {
+async function login(parent, args, context, info) {
   const user = await context.db.query.user({
     where: {
       email: args.email
@@ -52,18 +52,20 @@ async function login(parent, args, context, inspect, info) {
 function post(parent, args, context, info) {
   const userId = getUserId(context)
   return context.db.mutation.createLink({
-    data: {
-      url: args.url,
-      description: args.description,
-      postedBy: {
-        connect: {
-          id: userId
-        }
+      data: {
+        url: args.url,
+        description: args.description,
+        postedBy: {
+          connect: {
+            id: userId
+          }
+        },
       },
     },
-    info,
-  })
+    info
+  )
 }
+
 
 module.exports = {
   signup,
