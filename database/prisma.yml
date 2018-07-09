@@ -1,6 +1,6 @@
-endpoint:      http://localhost:4466
+#endpoint:     ''
+endpoint:      https://eu1.prisma.sh/aleksandr-ivashchenko/test_graphql_prisma/dev
 datamodel:     datamodel.graphql
-secret:        mysecret123
 
 # deploy hook
 hooks:

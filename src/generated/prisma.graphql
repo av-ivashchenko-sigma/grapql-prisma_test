@@ -1,5 +1,5 @@
 # source: http://localhost:4466
-# timestamp: Fri Jul 06 2018 18:59:21 GMT+0300 (EEST)
+# timestamp: Mon Jul 09 2018 11:51:24 GMT+0300 (EEST)
 
 type AggregateLink {
   count: Int!
@@ -18,6 +18,7 @@ type Link implements Node {
   id: ID!
   description: String!
   url: String!
+  postedBy(where: UserWhereInput): User
 }
 
 """A connection to a list of items."""
@@ -33,11 +34,17 @@ type LinkConnection {
 input LinkCreateInput {
   description: String!
   url: String!
+  postedBy: UserCreateOneWithoutLinksInput
 }
 
-input LinkCreateManyInput {
-  create: [LinkCreateInput!]
+input LinkCreateManyWithoutPostedByInput {
+  create: [LinkCreateWithoutPostedByInput!]
   connect: [LinkWhereUniqueInput!]
+}
+
+input LinkCreateWithoutPostedByInput {
+  description: String!
+  url: String!
 }
 
 """An edge in a connection."""
@@ -107,34 +114,35 @@ input LinkSubscriptionWhereInput {
   node: LinkWhereInput
 }
 
-input LinkUpdateDataInput {
-  description: String
-  url: String
-}
-
 input LinkUpdateInput {
   description: String
   url: String
+  postedBy: UserUpdateOneWithoutLinksInput
 }
 
-input LinkUpdateManyInput {
-  create: [LinkCreateInput!]
+input LinkUpdateManyWithoutPostedByInput {
+  create: [LinkCreateWithoutPostedByInput!]
   connect: [LinkWhereUniqueInput!]
   disconnect: [LinkWhereUniqueInput!]
   delete: [LinkWhereUniqueInput!]
-  update: [LinkUpdateWithWhereUniqueNestedInput!]
-  upsert: [LinkUpsertWithWhereUniqueNestedInput!]
+  update: [LinkUpdateWithWhereUniqueWithoutPostedByInput!]
+  upsert: [LinkUpsertWithWhereUniqueWithoutPostedByInput!]
 }
 
-input LinkUpdateWithWhereUniqueNestedInput {
-  where: LinkWhereUniqueInput!
-  data: LinkUpdateDataInput!
+input LinkUpdateWithoutPostedByDataInput {
+  description: String
+  url: String
 }
 
-input LinkUpsertWithWhereUniqueNestedInput {
+input LinkUpdateWithWhereUniqueWithoutPostedByInput {
   where: LinkWhereUniqueInput!
-  update: LinkUpdateDataInput!
-  create: LinkCreateInput!
+  data: LinkUpdateWithoutPostedByDataInput!
+}
+
+input LinkUpsertWithWhereUniqueWithoutPostedByInput {
+  where: LinkWhereUniqueInput!
+  update: LinkUpdateWithoutPostedByDataInput!
+  create: LinkCreateWithoutPostedByInput!
 }
 
 input LinkWhereInput {
@@ -266,9 +274,7 @@ input LinkWhereInput {
 
   """All values not ending with the given string."""
   url_not_ends_with: String
-  _MagicalBackRelation_LinkToUser_every: UserWhereInput
-  _MagicalBackRelation_LinkToUser_some: UserWhereInput
-  _MagicalBackRelation_LinkToUser_none: UserWhereInput
+  postedBy: UserWhereInput
 }
 
 input LinkWhereUniqueInput {
@@ -282,18 +288,18 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
-  createUser(data: UserCreateInput!): User!
   createLink(data: LinkCreateInput!): Link!
-  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  createUser(data: UserCreateInput!): User!
   updateLink(data: LinkUpdateInput!, where: LinkWhereUniqueInput!): Link
-  deleteUser(where: UserWhereUniqueInput!): User
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteLink(where: LinkWhereUniqueInput!): Link
-  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
   upsertLink(where: LinkWhereUniqueInput!, create: LinkCreateInput!, update: LinkUpdateInput!): Link!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyLinks(data: LinkUpdateInput!, where: LinkWhereInput): BatchPayload!
-  deleteManyUsers(where: UserWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
   deleteManyLinks(where: LinkWhereInput): BatchPayload!
+  deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -324,12 +330,12 @@ type PageInfo {
 }
 
 type Query {
-  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   links(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Link]!
-  user(where: UserWhereUniqueInput!): User
+  users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   link(where: LinkWhereUniqueInput!): Link
-  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  user(where: UserWhereUniqueInput!): User
   linksConnection(where: LinkWhereInput, orderBy: LinkOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LinkConnection!
+  usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -339,8 +345,8 @@ type Query {
 }
 
 type Subscription {
-  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   link(where: LinkSubscriptionWhereInput): LinkSubscriptionPayload
+  user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
 type User implements Node {
@@ -365,7 +371,18 @@ input UserCreateInput {
   name: String!
   email: String!
   password: String!
-  links: LinkCreateManyInput
+  links: LinkCreateManyWithoutPostedByInput
+}
+
+input UserCreateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutLinksInput {
+  name: String!
+  email: String!
+  password: String!
 }
 
 """An edge in a connection."""
@@ -442,7 +459,27 @@ input UserUpdateInput {
   name: String
   email: String
   password: String
-  links: LinkUpdateManyInput
+  links: LinkUpdateManyWithoutPostedByInput
+}
+
+input UserUpdateOneWithoutLinksInput {
+  create: UserCreateWithoutLinksInput
+  connect: UserWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: UserUpdateWithoutLinksDataInput
+  upsert: UserUpsertWithoutLinksInput
+}
+
+input UserUpdateWithoutLinksDataInput {
+  name: String
+  email: String
+  password: String
+}
+
+input UserUpsertWithoutLinksInput {
+  update: UserUpdateWithoutLinksDataInput!
+  create: UserCreateWithoutLinksInput!
 }
 
 input UserWhereInput {

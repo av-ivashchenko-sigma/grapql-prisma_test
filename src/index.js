@@ -23,10 +23,10 @@ const server = new GraphQLServer({
     ...req,
     db: new Prisma({
       typeDefs: 'src/generated/prisma.graphql',
-      endpoint: 'https://localhost:4000',
+      endpoint: 'https://eu1.prisma.sh/aleksandr-ivashchenko/test_graphql_prisma/dev',
       debug: true,
     })
   })
 })
 
-server.start(() => console.log(`Server is running on http://localhost:4000`))
+server.start(() => console.log(`Server is running on dev env`))
