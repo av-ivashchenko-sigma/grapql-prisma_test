@@ -4,7 +4,7 @@ function newLinkSubscribe(parent, args, context, info) {
       mutation_in: ['CREATED']
     },
   }, info)
-}prism
+}
 
 const newLink = {
   subscribe: newLinkSubscribe
